@@ -23,7 +23,13 @@ ELSE(NOT WIN32)
 	FIND_PACKAGE(Win32GTKBundle)
 ENDIF(NOT WIN32)
 
-SET(OPENSCENEGRAPH_INCLUDE_DIR "" CACHE PATH "Location of the OSG include headers.")
+FIND_PACKAGE(osg)
+FIND_PACKAGE(osgDB)
+FIND_PACKAGE(osgUtil)
+FIND_PACKAGE(osgGA)
+FIND_PACKAGE(osgViewer)
+
+SET(OPENSCENEGRAPH_INCLUDE_DIR ${OSG_INCLUDE_DIR} CACHE PATH "Location of the OSG include headers.")
 SET(OPENSCENEGRAPH_LIB_DIR "" CACHE PATH "Location of the the OSG library objects.")
 
 SET(SRC_FILES
@@ -56,12 +62,12 @@ SOURCE_GROUP("Source Files" FILES ${SRC_FILES})
 INCLUDE_DIRECTORIES(
 	include
 	ext/cairocks/src
-	${OPENSCENEGRAPH_INCLUDE_DIR}
+        ${OSG_INCLUDE_DIR}
 	${CAIRO_INCLUDE_DIRS}
 )
 
 LINK_DIRECTORIES(
-	${OPENSCENEGRAPH_LIB_DIR}
+	${OSG_LIB_DIR}
 	${CAIRO_LIBRARY_DIRS}
 )
 
@@ -71,12 +77,7 @@ ADD_LIBRARY(osgCairo SHARED ${HEADER_FILES} ${SRC_FILES})
 # Cairo is a C-only library so the same one (release) can be linked to both
 # debug and release without problems.
 TARGET_LINK_LIBRARIES(osgCairo
-	debug     OpenThreads${CMAKE_DEBUG_POSTFIX}
-	optimized OpenThreads
-	debug     osg${CMAKE_DEBUG_POSTFIX}
-	optimized osg
-	debug     osgDB${CMAKE_DEBUG_POSTFIX}
-	optimized osgDB
+        ${OSG_LIBRARY} ${OSGUTIL_LIBRARY} ${OSGDB_LIBRARY} ${OSGGA_LIBRARY} ${OSGVIEWER_LIBRARY} ${OPENTHREADS_LIBRARY}
 	debug     cairo
 	optimized cairo
 )

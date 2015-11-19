@@ -1,10 +1,9 @@
 PROJECT(osgcairodrawspeed)
 
 LINK_LIBRARIES(osgCairo
-	debug     osgViewer${CMAKE_DEBUG_POSTFIX}
-	optimized osgViewer
-	debug     osgGA${CMAKE_DEBUG_POSTFIX}
-	optimized osgGA
+    ${OSGDB_LIBRARY}
+    ${OSGGA_LIBRARY}
+    ${OSGVIEWER_LIBRARY}
 )
 
 ADD_EXECUTABLE(osgcairodrawspeed osgcairodrawspeed.cpp)
