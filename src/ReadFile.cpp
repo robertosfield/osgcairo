@@ -11,9 +11,12 @@ Image* readImageFile(const std::string& path, osgDB::ReaderWriter::Options* opti
 
 	if(!image) return 0;
 
-	Image* cairoImage = new Image();
+	osg::ref_ptr<Image> cairoImage = new Image();
 
-	if(cairoImage->allocateSurface(image)) return cairoImage;
+	if(cairoImage->allocateSurface(image.get()))
+        {
+            return cairoImage.release();
+        }
 
 	return 0;
 }

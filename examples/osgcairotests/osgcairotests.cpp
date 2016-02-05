@@ -9,7 +9,7 @@ const unsigned int IMG_WIDTH  = 512;
 const unsigned int IMG_HEIGHT = 256;
 const char*        FILE_EXT   = ".png";
 
-void textOnImage(osgCairo::Image* image, const std::string& name) {
+void textOnImage(const osg::ref_ptr<osgCairo::Image>& image, const std::string& name) {
 	cairo_t* c = image->createContext();
 
 	if(!cairo_status(c)) {
@@ -49,7 +49,7 @@ void textOnImage(osgCairo::Image* image, const std::string& name) {
 
 osgCairo::Image* createImage(cairo_format_t format, const std::string& name) {
 	osgCairo::Image* image = new osgCairo::Image();
-	
+
 	if(image->allocateSurface(IMG_WIDTH, IMG_HEIGHT, format)) {
 		textOnImage(image, name);
 
@@ -59,7 +59,7 @@ osgCairo::Image* createImage(cairo_format_t format, const std::string& name) {
 	return image;
 }
 
-void writeImage(osgCairo::Image* image, const std::string& path) {
+void writeImage(const osg::ref_ptr<osgCairo::Image>& image, const std::string& path) {
 	if(!image) {
 		OSG_NOTICE << "Warning: " << path << " couldn't be written." << std::endl;
 
@@ -68,11 +68,11 @@ void writeImage(osgCairo::Image* image, const std::string& path) {
 
 	OSG_NOTICE << "Writing: " << path << FILE_EXT << std::endl;
 
-	// Calling this function will convert the alpha levels internally so that they 
+	// Calling this function will convert the alpha levels internally so that they
 	// are not premultiplied, resulting in a "proper" PNG. However, cairo uses
 	// premultiplied alpha internally.
 	// if(image->getSurfaceFormat() == CAIRO_FORMAT_ARGB32) image->unPreMultiply();
-	
+
 	osgDB::writeImageFile(*image, path + FILE_EXT);
 }
 
@@ -82,7 +82,7 @@ osgCairo::Image* readImage(const std::string& path) {
 	return osgCairo::readImageFile(path + FILE_EXT);
 }
 
-void imageStats(osgCairo::Image* image) {
+void imageStats(const osg::ref_ptr<osgCairo::Image>& image) {
 	cairo_surface_t* surface = image->getSurface();
 
 	OSG_NOTICE
@@ -112,16 +112,16 @@ int main(int argc, char** argv) {
 	imageStats(orig);
 
 	osg::ref_ptr<osgCairo::Image> copy = new osgCairo::Image(*orig);
-	
+
 	imageStats(copy);
 
 	// Test DEEP copying...
 	OSG_WARN << "Copying: DEEP_COPY_IMAGES" << std::endl;
-	
+
 	imageStats(orig);
-	
+
 	copy = new osgCairo::Image(*orig, osg::CopyOp::DEEP_COPY_IMAGES);
-	
+
 	imageStats(copy);
 
 	textOnImage(copy, "copy-from-orig");
